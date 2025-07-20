@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    
+    <meta charset="UTF-8">
+    <title>{% block title %}Deux Tours de Chance{% endblock %}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Barre de navigation */
+        .navbar {
+            background-color: #18191a;
+            overflow: hidden;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 20px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- game/templates/game/base.html -->
+
+<div class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Tous les liens alignés à gauche -->
+            <ul class="navbar-nav me-auto">
+                <col class="nav-item">
+                    <a class="nav-link" href="/">🎲 Accueil</a>
+            </col>
+                <col class="nav-item">
+                    <a class="nav-link" href="/historique/">📜 Historique</a>
+        </col>
+                {% if user.is_authenticated %}
+                    <col class="nav-item">
+                        <span class="nav-link">{{ user.username }}</span>
+                    </col>
+                    <col class="nav-item">
+                        <a class="nav-link" href="/logout/">🚪Déconnexion</a>
+                    </col>
+                {% else %}
+                    <col class="nav-item">
+                        <a class="nav-link" href="/login/">🔐 Connexion</a>
+                    </col>
+                    <col class="nav-item">
+                        <a class="nav-link" href="/register/">📝 Inscription</a>
+                </col>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        {% block content %}
+        
+        {% endblock %}
+    </div>
+
+</body>
+</html>

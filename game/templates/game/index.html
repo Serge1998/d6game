@@ -1,0 +1,172 @@
+
+{% extends "game/base.html" %}
+{% block title %}Accueil - Deux Tours de Chance{% endblock %}
+
+{% block content %}
+
+<!-- game/templates/game/index.html -->
+
+
+<div id="partie">
+    <h2>🎲 Deux Tours de Chance</h2>
+    <!-- templates/game/index.html -->
+
+    <!-- Numéro de la partie -->
+    <!-- Ajoute une div pour afficher le numéro -->
+    <p>Partie actuelle : <strong>#<span id="numero-partie">0</span></strong></p>
+
+    <p id="compteur">⏳ Prochaine partie dans : <strong><span id="temps-restant">60</span> secondes</strong></p>
+
+    <!-- Layout : Joueur à gauche, Croupier à droite -->
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap;">
+        
+        <!-- Joueur -->
+        <div style="text-align: center; flex: 1; min-width: 200px;">
+            <h3>👤 Joueur</h3>
+            <div class="dice-container" id="joueur-dice">
+                <div class="die" id="joueur-die1">?</div>
+                <div class="die" id="joueur-die2">?</div>
+            </div>
+            <p><strong>Total : <span id="joueur-total">0</span></strong></p>
+        </div>
+
+        <!-- VS -->
+        <div style="text-align: center; font-size: 2rem; font-weight: bold; color: #00bfff;">
+            VS
+        </div>
+
+        <!-- Croupier -->
+        <div style="text-align: center; flex: 1; min-width: 200px;">
+            <h3>🎩 Croupier</h3>
+            <div class="dice-container" id="croupier-dice">
+                <div class="die" id="croupier-die1">?</div>
+                <div class="die" id="croupier-die2">?</div>
+            </div>
+            <p><strong>Total : <span id="croupier-total">0</strong></p>
+        </div>
+    </div>
+
+    <!-- Résultat final -->
+    <div style="text-align: center; margin-top: 20px;">
+        <h3>Gagnant : <span id="gagnant">En attente...</span></h3>
+        <p><small>Fin de la partie : <span id="date-fin">jamais</span></small></p>
+    </div>
+</div>
+
+<style>
+    #compteur {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        color: #00bfff;
+    }
+
+    #temps-restant {
+        font-weight: bold;
+        color: #ffc107;
+    }
+</style>
+
+<style>
+    .dice-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    .die {
+        width: 60px;
+        height: 60px;
+        background-color: #007BFF;
+        border-radius: 8px;
+        color: rgb(17, 30, 104);
+        font-size: 24px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .die.animate {
+        background-color: #0056b3;
+        transform: scale(1.2) rotate(360deg);
+    }
+</style>
+
+<script>
+    let dernierTimestamp = 0;
+
+    function lancerDesAnimation() {
+        const joueurDie1 = document.getElementById('joueur-die1');
+        const joueurDie2 = document.getElementById('joueur-die2');
+        const croupierDie1 = document.getElementById('croupier-die1');
+        const croupierDie2 = document.getElementById('croupier-die2');
+
+        // Animation des dés
+        [joueurDie1, joueurDie2, croupierDie1, croupierDie2].forEach(die => {
+            die.classList.add('animate');
+        });
+
+        setTimeout(() => {
+            [joueurDie1, joueurDie2, croupierDie1, croupierDie2].forEach(die => {
+                die.classList.remove('animate');
+            });
+        }, 1000);
+    }
+
+    function chargerDernierePartie() {
+        fetch('/api/derniere-partie/')
+            .then(response => response.json())
+            .then(data => {
+                if (Object.keys(data).length === 0) return;
+
+                lancerDesAnimation();
+
+                setTimeout(() => {
+                    document.getElementById('joueur-die1').textContent = data.joueur_tour1;
+                    document.getElementById('joueur-die2').textContent = data.joueur_tour2;
+                    document.getElementById('croupier-die1').textContent = data.croupier_tour1;
+                    document.getElementById('croupier-die2').textContent = data.croupier_tour2;
+                    document.getElementById('joueur-total').textContent = data.joueur_total;
+                    document.getElementById('croupier-total').textContent = data.croupier_total;
+                    document.getElementById('gagnant').textContent = data.gagnant;
+                    document.getElementById('date-fin').textContent = data.date_fin;
+                    document.getElementById('numero-partie').textContent = data.numero;
+
+                    // Mise à jour du timestamp de la dernière partie
+                    const dateFin = new Date(data.date_fin.replace(' ', 'T'));
+                    dernierTimestamp = dateFin.getTime();
+                }, 1000);
+            });
+    }
+
+    function demarrerCompteur() {
+        const compteur = document.getElementById('temps-restant');
+
+        function miseAJourCompteur() {
+            const maintenant = new Date().getTime();
+            const prochainePartie = dernierTimestamp + 60000; // +60 secondes
+            const tempsRestant = Math.max(0, Math.floor((prochainePartie - maintenant) / 1000));
+
+            if (tempsRestant === 0) {
+                chargerDernierePartie(); // Recharger la nouvelle partie
+            }
+
+            compteur.textContent = tempsRestant;
+        }
+
+        miseAJourCompteur();
+        setInterval(miseAJourCompteur, 1000);
+    }
+
+    // Charger la dernière partie au départ
+    chargerDernierePartie();
+
+    // Recharger toutes les 10 secondes
+    setInterval(chargerDernierePartie, 10000);
+
+    // Démarrer le compteur
+    demarrerCompteur();
+</script>
+    {% endblock %}

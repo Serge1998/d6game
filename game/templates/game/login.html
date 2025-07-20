@@ -1,0 +1,122 @@
+{% extends "game/base.html" %}
+{% block title %}Connexion - Deux Tours de Chance{% endblock %}
+
+{% block content %}
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background-color: #1e1e2f;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: up;
+        height: 70vh;
+        padding: 20px;
+    }
+
+    .login-card {
+        background-color: #2a2a3d;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .login-card h3 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1cm; /* ⬅️ Espacement fixe de 1 cm entre les champs */
+    }
+
+    .form-label {
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 1rem;
+        border: none;
+        background-color: #3a3a5a;
+        color: white;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        border-color: #007BFF;
+    }
+
+    .btn-primary {
+        background-color: #007BFF;
+        border: none;
+        width: 100%;
+        padding: 0.6rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .link-register {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .link-register a {
+        color: #00bfff;
+        text-decoration: none;
+    }
+
+    .link-register a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <h3>🔐 Connexion</h3>
+
+        {% if form.errors %}
+            <div class="alert alert-danger" style="color: red;">
+                Les identifiants sont incorrects. Réessayez.
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_username" class="form-label">Nom d’utilisateur</label>
+                {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password" class="form-label">Mot de passe</label>
+                {{ form.password }}
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </div>
+        </form>
+
+        <div class="link-register">
+            Pas encore de compte ? <a href="/register/">S’inscrire</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

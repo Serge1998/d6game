@@ -1,0 +1,98 @@
+{% extends "game/base.html" %}
+{% block title %}Historique - Deux Tours de Chance{% endblock %}
+
+{% block content %}
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background-color: #1e1e2f;
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .historique-container {
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #444;
+    }
+
+    th {
+        background-color: #2a2a3d;
+    }
+
+    tr:hover {
+        background-color: #3a3a5a;
+    }
+
+    .btn-retour {
+        display: inline-block;
+        margin-bottom: 20px;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .btn-retour:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="historique-container">
+    <h2>📜 Historique des parties</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Partie #</th>
+                <th>Joueur</th>
+                <th>Croupier</th>
+                <th>Gagnant</th>
+                <th>Date/heure</th>
+            </tr>
+        </thead>
+        <tbody id="historique-body">
+            <!-- L’historique sera chargé via AJAX -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function chargerHistorique() {
+        fetch('/api/historique/')
+            .then(response => response.json())
+            .then(data => {
+                let html = '';
+                data.forEach(p => {
+                    html += `
+                        <tr>
+                            <td>#${p.numero}</td>
+                            <td>${p.joueur_total}</td>
+                            <td>${p.croupier_total}</td>
+                            <td>${p.gagnant}</td>
+                            <td>${p.date_fin}</td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('historique-body').innerHTML = html;
+            });
+    }
+
+    // Charger dès le départ
+    chargerHistorique();
+
+    // Recharger toutes les 10 secondes
+    setInterval(chargerHistorique, 10000);
+</script>
+{% endblock %}
